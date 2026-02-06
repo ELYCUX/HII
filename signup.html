@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up | AI Interview Coach</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Main CSS -->
+    <link rel="stylesheet" href="/static/style.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🤖</text></svg>">
+</head>
+<body class="auth-bg">
+
+<div class="auth-card">
+    <div class="setup-icon">
+        <i class="fas fa-user-plus"></i>
+    </div>
+    
+    <h2>Create Account</h2>
+    <p class="auth-subtitle">Join thousands improving their interview skills</p>
+    
+    {% if error %}
+    <div class="error">
+        <i class="fas fa-exclamation-circle"></i> {{ error }}
+    </div>
+    {% endif %}
+    
+    <form method="POST">
+        <div style="position: relative;">
+            <input 
+                type="email" 
+                name="email" 
+                placeholder="Email address" 
+                required
+                style="padding-left: 2.75rem;"
+            >
+            <i class="fas fa-envelope" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
+        </div>
+        
+        <div style="position: relative;">
+            <input 
+                type="password" 
+                name="password" 
+                placeholder="Create password" 
+                required
+                style="padding-left: 2.75rem;"
+            >
+            <i class="fas fa-lock" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
+        </div>
+        
+        <div style="margin-top: 0.5rem; padding: 0.75rem; background: #f8fafc; border-radius: var(--radius);">
+            <p style="margin: 0; color: var(--text-muted); font-size: 0.85rem;">
+                <i class="fas fa-info-circle"></i> Password should be at least 6 characters
+            </p>
+        </div>
+        
+        <button type="submit" style="margin-top: 1.5rem;">
+            <i class="fas fa-user-check"></i> Create Account
+        </button>
+    </form>
+    
+    <div class="auth-links">
+        <p>Already have an account? <a href="/login">Login here</a></p>
+        <p style="margin-top: 1rem; font-size: 0.85rem; color: var(--text-light);">
+            <i class="fas fa-shield-alt"></i> Your data is secure and private
+        </p>
+    </div>
+    
+    <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border);">
+        <h4 style="color: var(--text-muted); font-size: 1rem; margin-bottom: 0.75rem;">Why Join?</h4>
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <i class="fas fa-brain" style="color: var(--primary);"></i>
+                <span style="font-size: 0.85rem;">AI-Powered Feedback</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <i class="fas fa-video" style="color: var(--primary);"></i>
+                <span style="font-size: 0.85rem;">Video Analysis</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <i class="fas fa-chart-line" style="color: var(--primary);"></i>
+                <span style="font-size: 0.85rem;">Progress Tracking</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <i class="fas fa-question-circle" style="color: var(--primary);"></i>
+                <span style="font-size: 0.85rem;">1000+ Questions</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
