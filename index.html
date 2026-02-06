@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Interview Coach | Dashboard</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Main CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🤖</text></svg>">
+</head>
+<body>
+
+<div class="app-container">
+
+    <!-- ================= SIDEBAR ================= -->
+    <aside class="sidebar">
+        <h2>AI Interview Coach</h2>
+        
+        <div class="user-info">
+            <p class="user-email">
+                <i class="fas fa-user-circle" style="margin-right: 8px;"></i>
+                Logged in as<br>
+                <strong>{{ user }}</strong>
+            </p>
+        </div>
+
+        <div class="user-meta">
+            <p>
+                <span><i class="fas fa-graduation-cap"></i> Branch:</span>
+                <b>{{ branch }}</b>
+            </p>
+            <p>
+                <span><i class="fas fa-chart-line"></i> Level:</span>
+                <b>{{ level }}</b>
+            </p>
+           <p>
+    <span><i class="fas fa-question-circle"></i> Questions:</span>
+    <b>Available</b>
+</p>
+        </div>
+
+        <div id="statusIndicator" class="status-badge">
+            <i class="fas fa-circle-check"></i> Ready
+        </div>
+
+        <div class="instructions">
+            <p>
+                <strong>How to Use:</strong><br>
+                1️⃣ <b>Read</b> the question carefully<br>
+                2️⃣ <b>Record</b> your video answer<br>
+                3️⃣ <b>Review</b> AI feedback & improve
+            </p>
+        </div>
+
+        <div class="instructions">
+            <p>
+                <strong>Tips for Success:</strong><br>
+                • Maintain eye contact with camera<br>
+                • Speak clearly and confidently<br>
+                • Structure your answer logically
+            </p>
+        </div>
+
+        <a href="/logout" class="logout-btn">
+            <i class="fas fa-sign-out-alt"></i> Logout
+        </a>
+    </aside>
+
+    <!-- ================= MAIN CONTENT ================= -->
+    <main class="content">
+        
+        <!-- ===== Header ===== -->
+        <div class="content-header">
+            <h3>AI-Powered Interview Practice</h3>
+            <div class="branch-indicator">
+                <i class="fas fa-code"></i>
+                {{ branch }} • {{ level }} Level
+            </div>
+        </div>
+
+        <!-- ================= QUESTION CARD ================= -->
+        <div class="question-card">
+            <div class="question-header">
+                <div class="question-icon">
+                    <i class="fas fa-question"></i>
+                </div>
+                <strong>Current Interview Question</strong>
+            </div>
+            
+            <p id="questionText" class="question-text">
+                {{ question }}
+            </p>
+            
+            <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                <button onclick="nextQuestion()" class="btn-primary">
+                    <i class="fas fa-sync-alt"></i> New Question
+                </button>
+                <button onclick="toggleQuestionHint()" class="btn-secondary">
+                    <i class="fas fa-lightbulb"></i>
+                </button>
+            </div>
+            
+            <div id="questionHint" class="hidden" style="margin-top: 1.5rem; padding: 1rem; background: #f0f9ff; border-radius: var(--radius); border-left: 4px solid var(--info);">
+                
+            </div>
+        </div>
+
+        <!-- ================= VIDEO SECTION ================= -->
+        <section class="video-section">
+            <div class="video-container">
+                <video id="webcam" autoplay muted playsinline></video>
+                <div id="videoOverlay" class="video-overlay hidden">
+                </div>
+            </div>
+            
+            <div class="video-controls">
+                <button id="startBtn" class="btn-success">
+                    <i class="fas fa-video"></i> Start Recording
+                </button>
+                <button id="stopBtn" class="btn-danger" disabled>
+                    <i class="fas fa-stop"></i> Stop & Analyze
+                </button>
+                <button id="retryBtn" class="btn-secondary" onclick="retryRecording()">
+                    <i class="fas fa-redo"></i> Retry
+                </button>
+            </div>
+            
+            <div style="text-align: center; margin-top: 1rem; color: var(--text-muted); font-size: 0.9rem;">
+                <i class="fas fa-info-circle"></i> Recording will analyze your answer for confidence, clarity, and communication skills
+            </div>
+        </section>
+
+        <!-- ================= DASHBOARD ================= -->
+        <section id="dashboard" class="dashboard hidden">
+            
+            <div class="dashboard-header">
+                <h3><i class="fas fa-chart-bar"></i> Performance Analysis</h3>
+                <div id="analysisTime" style="color: var(--text-muted); font-size: 0.9rem; margin-left: auto;">
+                    Analyzed just now
+                </div>
+            </div>
+
+            <!-- Score & Transcript -->
+            <div class="top-row">
+                <div class="score-card">
+                    <label>Confidence Score</label>
+                    <div class="score-value" id="confScore">0%</div>
+                    <div class="score-status" id="scoreStatus">—</div>
+                    <div style="margin-top: 1.5rem;">
+                        <div style="height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden;">
+                            <div id="scoreBar" style="height: 100%; width: 0%; background: var(--primary-gradient); transition: width 1s ease;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="transcript-card">
+                    <label>Answer Transcript</label>
+                    <p id="transcriptText" style="font-style: italic; color: var(--text-light);">
+                        Your answer transcript will appear here after analysis...
+                    </p>
+                </div>
+            </div>
+
+            <!-- Metrics Grid -->
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <strong>
+                        <div class="metric-icon eye">
+                            <i class="fas fa-eye"></i>
+                        </div>
+                        Eye Contact
+                    </strong>
+                    <p id="eyeContactText">Waiting for analysis...</p>
+                </div>
+
+                <div class="metric-card">
+                    <strong>
+                        <div class="metric-icon face">
+                            <i class="fas fa-smile"></i>
+                        </div>
+                        Facial Expressions
+                    </strong>
+                    <p id="facialText">Waiting for analysis...</p>
+                </div>
+
+                <div class="metric-card">
+                    <strong>
+                        <div class="metric-icon speak">
+                            <i class="fas fa-comments"></i>
+                        </div>
+                        Speaking Style
+                    </strong>
+                    <p id="speakingText">Waiting for analysis...</p>
+                </div>
+            </div>
+
+            <!-- Tips Card -->
+            <div class="tips-card">
+                <h3>Actionable Improvement Tips</h3>
+                <ul id="tipsList">
+                    <li>Complete your recording to see personalized feedback</li>
+                    <li>Try to maintain consistent eye contact with the camera</li>
+                    <li>Structure your answer with clear beginning, middle, and end</li>
+                </ul>
+            </div>
+
+            <!-- Action Buttons -->
+            <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                <button onclick="downloadReport()" class="btn-secondary">
+                    <i class="fas fa-download"></i> Download Report
+                </button>
+                <button onclick="practiceAgain()" class="btn-primary">
+                    <i class="fas fa-redo"></i> Practice Same Question Again
+                </button>
+            </div>
+
+        </section>
+
+    </main>
+</div>
+
+<!-- ================= JavaScript ================= -->
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+
+<script>
+// Toggle question hint
+function toggleQuestionHint() {
+    const hint = document.getElementById('questionHint');
+    hint.classList.toggle('hidden');
+}
+
+// Get new question from server
+async function nextQuestion() {
+    try {
+        const res = await fetch("/new-question");
+        const data = await res.json();
+        
+        if (data.question) {
+            document.getElementById("questionText").innerText = data.question;
+            
+            // Show notification
+            showNotification('New question loaded successfully!', 'success');
+            
+            // Reset dashboard if open
+            document.getElementById('dashboard').classList.add('hidden');
+        }
+    } catch (err) {
+        showNotification('Failed to load new question', 'error');
+        console.error(err);
+    }
+}
+
+// Download report
+function downloadReport() {
+    const score = document.getElementById('confScore').innerText;
+    const transcript = document.getElementById('transcriptText').innerText;
+    const eyeContact = document.getElementById('eyeContactText').innerText;
+    const facial = document.getElementById('facialText').innerText;
+    const speaking = document.getElementById('speakingText').innerText;
+    
+    const tips = [];
+    document.querySelectorAll('#tipsList li').forEach(li => {
+        tips.push(li.innerText);
+    });
+    
+    const report = `
+AI INTERVIEW COACH - PERFORMANCE REPORT
+========================================
+Date: ${new Date().toLocaleDateString()}
+Time: ${new Date().toLocaleTimeString()}
+Branch: {{ branch }}
+Level: {{ level }}
+Question: ${document.getElementById('questionText').innerText}
+
+RESULTS:
+--------
+Confidence Score: ${score}
+Eye Contact: ${eyeContact}
+Facial Expressions: ${facial}
+Speaking Style: ${speaking}
+
+TRANSCRIPT:
+-----------
+${transcript}
+
+IMPROVEMENT TIPS:
+-----------------
+${tips.map(tip => `• ${tip}`).join('\n')}
+
+Keep practicing! 🚀
+`;
+    
+    const blob = new Blob([report], { type: 'text/plain' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `interview-report-${new Date().toISOString().split('T')[0]}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+    
+    showNotification('Report downloaded successfully!', 'success');
+}
+
+// Practice same question again
+function practiceAgain() {
+    document.getElementById('dashboard').classList.add('hidden');
+    showNotification('Ready to practice the same question again!', 'info');
+}
+
+// Retry recording
+function retryRecording() {
+    document.getElementById('dashboard').classList.add('hidden');
+    showNotification('Ready to record again!', 'info');
+}
+
+// Show notification
+function showNotification(message, type = 'info') {
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.innerHTML = `
+        <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+        <span>${message}</span>
+        <button onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>
+    `;
+    
+    // Add styles
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: ${type === 'success' ? 'var(--success)' : type === 'error' ? 'var(--danger)' : 'var(--primary)'};
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-lg);
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        z-index: 1000;
+        animation: slideIn 0.3s ease;
+    `;
+    
+    // Add to body
+    document.body.appendChild(notification);
+    
+    // Auto remove after 5 seconds
+    setTimeout(() => {
+        if (notification.parentElement) {
+            notification.remove();
+        }
+    }, 5000);
+}
+
+// Add CSS for notification animation
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes slideIn {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+    .notification button {
+        background: transparent;
+        border: none;
+        color: white;
+        cursor: pointer;
+        margin-left: 1rem;
+        opacity: 0.7;
+        transition: opacity 0.2s;
+    }
+    .notification button:hover {
+        opacity: 1;
+    }
+`;
+document.head.appendChild(style);
+
+// Initialize when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    // Set current time
+    document.getElementById('analysisTime').textContent = 
+        'Last updated: ' + new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+});
+</script>
+
+</body>
+</html>
