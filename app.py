@@ -17,7 +17,7 @@ UPLOAD_FOLDER = "uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 # ================= GEMINI CONFIG =================
-GOOGLE_API_KEY = "AIzaSyCnv6i2GHuabQPvOYKIS4iP-0RVrMBpWdQ"
+GOOGLE_API_KEY = "GIVE YOU API"
 
 genai.configure(api_key=GOOGLE_API_KEY)
 
